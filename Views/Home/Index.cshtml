@@ -1,0 +1,74 @@
+﻿@model IEnumerable<Order>
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Customer</th>
+            <th>Total</th>
+            <th>Items</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model == null || Model.Count() < 1)
+        {
+            <tr>
+                <td colspan="4" style="text-align:center"></td>
+            </tr>
+        }
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.CustomerName</td>
+                <td>@item.Total</td>
+                <td>@item.Details.Count</td>
+                <td>Del | Edit</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts{
+<script type="text/javascript">
+    var controllCount = 1;
+        $(document).on('click', '.btn-add-new', function(){
+            var clone = $('.cln-det').clone().first();
+            $('#content-hldr').append(clone);
+            controllCount++;
+            rename();
+            resetValidation();
+        })
+
+        function resetValidation(){
+            var $form = $("form");
+            $form.unbind();
+            $form.data("validator", null);
+            $.validator.unobtrusive.parse(document);
+        }
+
+        function rename(){
+           var rows = $('.cln-det');
+           for(var i = 0; i < rows.length; i++){
+               var cntrls = $(rows[i]).find('.cntrl');
+               var validations = $(rows[i]).find('.valid-cntrl');
+               for(var j =0; j < cntrls.length; j++){
+                 var nme =  $(cntrls[j]).attr('name').split('.')[1];
+                 $(cntrls[j]).attr('name','Details['+i+'].'+nme)
+               }
+                for(var j =0; j < validations.length; j++){
+                 var nme =  $(validations[j]).attr('data-valmsg-for').split('.')[1];
+                 $(validations[j]).attr('data-valmsg-for','Details['+i+'].'+nme)
+               }
+           }
+        }
+
+</script>
+}

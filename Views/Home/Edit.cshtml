@@ -1,0 +1,91 @@
+﻿@model Order
+
+<form asp-action="Edit" asp-controller="Home" method="post">
+    <div class="form-group">
+        <label for="txtCustomer">Customer Name</label>
+        <input type="text" class="form-control" id="txtCustomer" aria-describedby="emailHelp" placeholder="Customer Name" asp-for=CustomerName>
+        <input type="hidden" value="@DateTime.Now" asp-for=Date />
+        <input type="hidden" asp-for=Id />
+        <span class="txt-danger" asp-validation-for=CustomerName></span>
+    </div>
+    <div class="form-group">
+        <label for="txtTotal">Total</label>
+        <input type="text" class="form-control" id="txtTotal" placeholder="Total Order Amount" asp-for=Total>
+        <span class="txt-danger" asp-validation-for=Total></span>
+    </div>
+    <hr class="col-md-12" />
+    <div id="content-hldr">
+        @for (int i = 0; i < Model.Details.Count; i++)
+        {
+            <div class="row cln-det">
+                <div class="col-md-5">
+                    <label>Product Name</label>
+                    <input type="text" class="form-control cntrl" aria-describedby="emailHelp" placeholder="Prioduct Name" asp-for=Details[i].ProductName>
+                    <input type="hidden" class="cntrl" asp-for=Details[i].Id />
+                    <span class="txt-danger valid-cntrl" asp-validation-for=Details[i].ProductName></span>
+                </div>
+                <div class="col-md-5">
+                    <label>Price</label>
+                    <input type="text" class="form-control cntrl" aria-describedby="emailHelp" placeholder="Total Price" asp-for=Details[i].Price>
+                    <span class="txt-danger valid-cntrl" asp-validation-for=Details[i].Price></span>
+                </div>
+                <div class="col-md-2">
+                    <div>&nbsp;</div>
+                    <button type="button" class="btn btn-primary btn-add-new">Add</button>
+                    <button type="button" class="btn btn-danger btn-del">Del</button>
+                </div>
+            </div>
+        }
+
+    </div>
+    <hr class="col-md-12" />
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+@section Scripts{
+<script type="text/javascript">
+    var controllCount = @Model.Details.Count;
+        $(document).on('click', '.btn-add-new', function(){
+            var clone = $('.cln-det').first().clone();
+            $(clone).find('.cntrl').val('');
+            $('#content-hldr').append(clone);
+            controllCount++;
+            rename();
+            resetValidation();
+        })
+
+        $(document).on('click', '.btn-del', function(){
+            if(controllCount > 1){
+                $(this).closest('.cln-det').remove();
+                controllCount--;
+                rename();
+            resetValidation();
+            }
+
+        })
+
+        function resetValidation(){
+            var $form = $("form");
+            $form.unbind();
+            $form.data("validator", null);
+            $.validator.unobtrusive.parse(document);
+        }
+
+        function rename(){
+           var rows = $('.cln-det');
+           for(var i = 0; i < rows.length; i++){
+               var cntrls = $(rows[i]).find('.cntrl');
+               var validations = $(rows[i]).find('.valid-cntrl');
+               for(var j =0; j < cntrls.length; j++){
+                 var nme =  $(cntrls[j]).attr('name').split('.')[1];
+                 $(cntrls[j]).attr('name','Details['+i+'].'+nme)
+               }
+                for(var j =0; j < validations.length; j++){
+                 var nme =  $(validations[j]).attr('data-valmsg-for').split('.')[1];
+                 $(validations[j]).attr('data-valmsg-for','Details['+i+'].'+nme)
+               }
+           }
+        }
+
+</script>
+}
